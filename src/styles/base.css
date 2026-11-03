@@ -1332,6 +1332,7 @@ a:hover {
   color: var(--oc-ink-muted);
   font-size: calc(12px * var(--font-scale));
   font-weight: 400;
+  /* 行盒 = 字号，图标盒与文字盒同高，居中才是真居中 */
   line-height: 1;
   cursor: pointer;
   user-select: none;
@@ -1862,16 +1863,12 @@ a:hover {
   animation: none;
 }
 
-/* 5. 与文字并排的图标下移 0.125em，落在字面中心 */
-.btn .icon,
-.pill .icon,
-.menu-item .icon,
-.menu-item-slot .icon,
-.disclosure .icon,
-.conv-item .icon,
-.attach-file .icon,
-.empty-mark .icon {
-  transform: translateY(0.125em);
+/* 5. 图标对齐的根因：SVG 是 inline 元素，行盒里自带基线以下的空档，所以
+      `align-items: center` 居中时看起来总是偏高或偏低。改成块级元素后，图标
+      盒与文字行盒就是同一套几何，flex 居中即视觉居中 —— 不需要任何 em 位移。 */
+.icon {
+  display: block;
+  flex: none;
 }
 
 /* 6. 所有数字锁 tabular-nums：流式时计数不会因字形宽度跳 */

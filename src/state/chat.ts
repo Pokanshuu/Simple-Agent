@@ -319,7 +319,8 @@ export const useChatStore = create<ChatStore>((set, get) => {
     const result = await runAgentLoop({
       history,
       tools,
-      maxSteps: isAgent && workspace ? Math.max(1, settings.agent.maxSteps) : 1,
+      // 0 = 不限步数：现代模型基本不会无意义地空转，真正的刹车是用户按停止。
+      maxSteps: isAgent && workspace ? (settings.agent.maxSteps > 0 ? settings.agent.maxSteps : Number.POSITIVE_INFINITY) : 1,
       signal: controller.signal,
       buildBody: (messages, specs) =>
         buildChatRequest({

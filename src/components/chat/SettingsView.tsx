@@ -578,21 +578,25 @@ function AgentTab() {
           </div>
         </Field>
 
-        <FieldRow label={t('settings.maxSteps')} >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, width: 220 }}>
-            <Slider
-              value={settings.agent.maxSteps}
-              min={1}
-              max={40}
-              step={1}
-              onChange={(value) =>
-                patch((current) => ({ ...current, agent: { ...current.agent, maxSteps: value } }))
-              }
-            />
-            <span className="mono" style={{ width: 24, textAlign: 'right' }}>
-              {settings.agent.maxSteps}
-            </span>
-          </div>
+        <FieldRow label={t('settings.maxSteps')} hint={t('settings.maxStepsHint')}>
+          <input
+            className="input"
+            style={{ width: 84, textAlign: 'right' }}
+            inputMode="numeric"
+            value={settings.agent.maxSteps > 0 ? settings.agent.maxSteps : ''}
+            placeholder="∞"
+            onChange={(event) => {
+              const raw = event.target.value.trim()
+              const parsed = raw === '' ? 0 : Number.parseInt(raw, 10)
+              patch((current) => ({
+                ...current,
+                agent: {
+                  ...current.agent,
+                  maxSteps: Number.isFinite(parsed) ? Math.max(0, parsed) : current.agent.maxSteps,
+                },
+              }))
+            }}
+          />
         </FieldRow>
 
         <Field label={t('settings.approval')} >

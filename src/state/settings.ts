@@ -28,7 +28,7 @@ export const DEFAULT_SETTINGS: Settings = {
   },
   agent: {
     workspace: null,
-    maxSteps: 12,
+    maxSteps: 64,
     approval: 'ask',
     enabledTools: [...TOOL_NAMES],
     autoContinue: true,
