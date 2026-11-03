@@ -6,7 +6,7 @@
  * Markdown).
  */
 
-import { memo, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { Dialog, IconButton, copyText, useToast } from '@/components/ui/primitives'
 import { MarkdownText } from '@/components/markdown/MarkdownText'
@@ -17,6 +17,43 @@ import { useChatStore } from '@/state/chat'
 import type { Attachment, Message, TodoItem } from '@/core/types'
 import { formatTokens } from '@/core/tokenEstimate'
 import { answerStepIndex } from '@/core/agent/loop'
+
+/** How long the outgoing answer stays mounted while it dissolves. */
+const EXIT_MS = 170
+
+/**
+ * Keep the previous text alive for one animation when it stops being the answer.
+ *
+ * A step's text starts life *as* the answer (it is the last turn with no tool
+ * calls) and stops being it the moment the model calls a tool. Unmounting it at
+ * that instant is what produced the "text flashes then vanishes" effect; holding
+ * it for EXIT_MS lets it dissolve instead.
+ */
+function useExitFade(value: string): { text: string; exiting: boolean } {
+  const [state, setState] = useState<{ text: string; exiting: boolean }>({
+    text: value,
+    exiting: false,
+  })
+  const previous = useRef(value)
+
+  useEffect(() => {
+    if (value.length > 0) {
+      previous.current = value
+      setState({ text: value, exiting: false })
+      return
+    }
+    if (previous.current.length === 0) {
+      setState({ text: '', exiting: false })
+      return
+    }
+    setState({ text: previous.current, exiting: true })
+    previous.current = ''
+    const timer = setTimeout(() => setState({ text: '', exiting: false }), EXIT_MS)
+    return () => clearTimeout(timer)
+  }, [value])
+
+  return state
+}
 
 function AttachmentList({ attachments }: { attachments: Attachment[] }) {
   if (attachments.length === 0) return null
@@ -108,6 +145,8 @@ function MessageItemImpl({
     [message.steps],
   )
 
+  const answer = useExitFade(message.content)
+
   /** Everything except the turn that produced the visible answer. */
   const timelineSteps = useMemo(() => {
     const index = answerStepIndex(message.steps)
@@ -146,8 +185,12 @@ function MessageItemImpl({
               <StepTimeline steps={timelineSteps} streaming={streaming} />
             )}
 
-            {message.content.trim().length > 0 ? (
-              <MarkdownText content={message.content} streaming={streaming} />
+            {answer.exiting ? (
+              <div className="md-exit" aria-hidden="true">
+                <MarkdownText content={answer.text} />
+              </div>
+            ) : answer.text.trim().length > 0 ? (
+              <MarkdownText content={answer.text} streaming={streaming} />
             ) : (
               streaming && <TypingDots />
             )}
