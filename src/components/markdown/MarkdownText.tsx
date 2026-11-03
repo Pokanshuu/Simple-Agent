@@ -75,7 +75,7 @@ function RetainHeight({ children }: { children: ReactNode }) {
  * 代价是滞后几十到一百多毫秒；换来的是**匀速前进**的观感和稳定的排版。
  */
 const REVEAL_INTERVAL_MS = 32
-const REVEAL_RATIO = 0.45
+const REVEAL_RATIO = 0.3
 
 function useSmoothReveal(content: string, streaming: boolean): string {
   const [shown, setShown] = useState(content)
