@@ -509,7 +509,6 @@ function PresetEditor({
 
 function AgentTab() {
   const t = useT()
-  const toast = useToast()
   const settings = useSettingsStore((s) => s.settings)
   const patch = useSettingsStore((s) => s.patch)
 
@@ -663,10 +662,7 @@ function AgentTab() {
         })}
       </div>
 
-      <button className="btn quiet" onClick={() => toast.show(t('settings.toolsSaved'))}>
-        <Icon name="check" size={14} />
-        {t('common.done')}
-      </button>
+
     </>
   )
 }
@@ -954,9 +950,7 @@ function AboutTab() {
 
       <div className="section">
         <div className="section-title">{t('about.licenses')}</div>
-        <div className="faint" style={{ fontSize: 12, marginBottom: 2 }}>
-          {t('about.licensesHint')}
-        </div>
+
         {OPEN_SOURCE.map((entry) => (
           <div className="field-row" key={entry.name} style={{ padding: '6px 0' }}>
             <div style={{ minWidth: 0 }}>
