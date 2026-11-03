@@ -11,10 +11,10 @@ import { Icon } from '@/components/ui/Icon'
 import { Dialog, IconButton, copyText, useToast } from '@/components/ui/primitives'
 import { MarkdownText } from '@/components/markdown/MarkdownText'
 import { ThinkingPanel } from './ThinkingPanel'
-import { StepTimeline, TodoPanel } from './StepTimeline'
+import { StepTimeline } from './StepTimeline'
 import { useT } from '@/i18n'
 import { useChatStore } from '@/state/chat'
-import type { Attachment, Message, TodoItem } from '@/core/types'
+import type { Attachment, Message } from '@/core/types'
 import { formatTokens } from '@/core/tokenEstimate'
 import { bodyReasoning, placeSteps } from '@/core/agent/trace'
 
@@ -112,9 +112,7 @@ export interface MessageItemProps {
   streaming: boolean
   /** Agent turns have side effects: no regenerate, no edit-resend, no delete. */
   canRewrite: boolean
-  /** Todos produced by this message's `todo_write` calls. */
-  todos: TodoItem[]
-  showTodos: boolean
+
 }
 
 function MessageItemImpl({
@@ -123,8 +121,6 @@ function MessageItemImpl({
   variantTotal,
   streaming,
   canRewrite,
-  todos,
-  showTodos,
 }: MessageItemProps) {
   const t = useT()
   const toast = useToast()
@@ -183,18 +179,21 @@ function MessageItemImpl({
           </>
         ) : (
           <div className="assistant-body">
+            {(hasToolCalls || message.steps.length > 1) && (
+              <StepTimeline steps={timelineSteps} streaming={streaming} />
+            )}
+
+            {/*
+             * 思考属于「最后那一步」，所以必须排在轨迹**之后**：
+             * 轨迹是已完成的回合，这一条是正在写 / 刚写完的回合。
+             * 放在前面就会出现「先看到第 2 步的思考，再看到第 1 步的工具调用」。
+             */}
             {reasoningText.length > 0 && (
               <ThinkingPanel
                 text={reasoningText}
                 reasoningStreaming={reasoningIsLive}
                 thinkingMs={message.thinkingMs}
               />
-            )}
-
-            {showTodos && todos.length > 0 && <TodoPanel todos={todos} />}
-
-            {(hasToolCalls || message.steps.length > 1) && (
-              <StepTimeline steps={timelineSteps} streaming={streaming} />
             )}
 
             {answer.exiting ? (

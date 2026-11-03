@@ -2044,3 +2044,18 @@ body {
   padding-left: 0;
   margin-left: 0;
 }
+
+/* 任务清单停靠区：运行态信息，长在输入框上方，滚动时不跟着消息跑掉 */
+.todo-dock {
+  flex: 0 0 auto;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto 6px;
+  padding: 0 0;
+}
+
+.todo-dock .todos {
+  margin: 0;
+  max-height: 132px;
+  overflow-y: auto;
+}

@@ -6,8 +6,16 @@
   font-size: calc(15px * var(--font-scale));
   line-height: 1.75;
   color: var(--oc-ink);
-  word-break: break-word;
-  overflow-wrap: anywhere;
+  /*
+   * 断行规则：
+   * - `word-break: normal` + `overflow-wrap: break-word` 只在单个超长词放不下时才断；
+   * - `overflow-wrap: anywhere`（曾经的写法）等于「任何位置都可以断」，于是 `、`、`，`
+   *   这类标点会被甩到行首，行首禁则直接失效；
+   * - `line-break: strict` 让浏览器按更严格的 CJK 断行规则走，避免标点落在行首。
+   */
+  word-break: normal;
+  overflow-wrap: break-word;
+  line-break: strict;
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -129,6 +137,8 @@
 }
 
 .md code {
+  /* 代码片段里是路径和 URL，必须允许任意位置断开 */
+  overflow-wrap: anywhere;
   font-family: var(--font-mono);
   font-size: 0.88em;
   padding: 0.1em 0.34em;

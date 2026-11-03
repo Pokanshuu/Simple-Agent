@@ -13,6 +13,7 @@ import { activePath, siblingCounts, siblingsOf } from '@/core/messageTree'
 import { useChatStore } from '@/state/chat'
 import { useT } from '@/i18n'
 import { MessageItem } from './MessageItem'
+import { TodoPanel } from './StepTimeline'
 import { Composer } from './Composer'
 import { ApprovalDialog } from './ApprovalDialog'
 
@@ -31,7 +32,6 @@ export function ChatView({
   const conversations = useChatStore((s) => s.conversations)
   const currentId = useChatStore((s) => s.currentId)
   const todos = useChatStore((s) => s.todos)
-  const todosMessageId = useChatStore((s) => s.todosMessageId)
   const rename = useChatStore((s) => s.renameConversation)
   const togglePin = useChatStore((s) => s.togglePin)
   const remove = useChatStore((s) => s.deleteConversation)
@@ -142,8 +142,6 @@ export function ChatView({
                   variantTotal={counts.get(message.parentId) ?? 1}
                   streaming={streamingId === message.id}
                   canRewrite={conversation?.mode !== 'AGENT'}
-                  todos={todos}
-                  showTodos={todosMessageId === message.id}
                 />
               )
             })}
@@ -155,6 +153,12 @@ export function ChatView({
         <button type="button" className="scroll-to-bottom" onClick={scrollToBottom} title={t('chat.scrollBottom')}>
           <Icon name="arrow-down" size={14} />
         </button>
+      )}
+
+      {todos.length > 0 && (
+        <div className="todo-dock">
+          <TodoPanel todos={todos} />
+        </div>
       )}
 
       <Composer />
