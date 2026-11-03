@@ -20,7 +20,11 @@ import type { AgentStep } from '@/core/types'
 /** One collapsed reasoning line; expands to the full chain of thought. */
 function ReasoningLine({ text, streaming }: { text: string; streaming: boolean }) {
   const t = useT()
-  const [open, setOpen] = useState(false)
+  // 正在想的这一轮展开；想完（streaming 转 false）就折叠回去
+  const [open, setOpen] = useState(streaming)
+  useEffect(() => {
+    setOpen(streaming)
+  }, [streaming])
   const preview = text.replace(/\s+/g, ' ').trim()
 
   return (
@@ -57,11 +61,10 @@ export function StepTimeline({
   streaming: boolean
 }) {
   const t = useT()
-  // 默认展开：思考已经搬进轨迹里，收起就等于「思考没了」。
-  // 之后完全听用户的（直接持有状态，不用 `manual ?? streaming` 推断）。
-  const [open, setOpen] = useState(true)
+  // 默认收起；这一轮在跑的时候自动展开，一轮结束自动收起。手动点过之后听用户的。
+  const [open, setOpen] = useState(false)
   useEffect(() => {
-    if (streaming) setOpen(true)
+    setOpen(streaming)
   }, [streaming])
 
   if (steps.length === 0) return null

@@ -54,19 +54,44 @@ describe('StepTimeline 结构', () => {
     }
   })
 
-  it('默认展开，点标题可以收起，再点回来', async () => {
-    const { container } = render(<StepTimeline steps={steps} streaming={false} />)
-    const collapse = container.querySelector('.collapse')
-    expect(collapse?.classList.contains('open')).toBe(true)
+  it('默认收起；一轮在跑时展开，结束后收起', async () => {
+    const { container, rerender } = render(<StepTimeline steps={steps} streaming={false} />)
+    expect(container.querySelector('.collapse')?.classList.contains('open')).toBe(false)
 
-    const header = container.querySelector('.disclosure') as HTMLElement
-    header.click()
+    rerender(<StepTimeline steps={steps} streaming />)
+    await Promise.resolve()
+    expect(container.querySelector('.collapse')?.classList.contains('open')).toBe(true)
+
+    rerender(<StepTimeline steps={steps} streaming={false} />)
     await Promise.resolve()
     expect(container.querySelector('.collapse')?.classList.contains('open')).toBe(false)
+  })
+
+  it('用户点过之后听用户的', async () => {
+    const { container } = render(<StepTimeline steps={steps} streaming={false} />)
+    const header = container.querySelector('.disclosure') as HTMLElement
+
+    header.click()
+    await Promise.resolve()
+    expect(container.querySelector('.collapse')?.classList.contains('open')).toBe(true)
 
     ;(container.querySelector('.disclosure') as HTMLElement).click()
     await Promise.resolve()
-    expect(container.querySelector('.collapse')?.classList.contains('open')).toBe(true)
+    expect(container.querySelector('.collapse')?.classList.contains('open')).toBe(false)
+  })
+
+  it('正在想的那一轮展开，想完折叠', async () => {
+    const liveSteps = [step(0, '', '想A'), step(1, '', '想B')]
+    const { container, rerender } = render(<StepTimeline steps={liveSteps} streaming />)
+    const lines = Array.from(container.querySelectorAll('.trace-reasoning .collapse'))
+    // 只有最后一条在展开（那一轮还在想）
+    expect(lines[0]?.classList.contains('open')).toBe(false)
+    expect(lines[1]?.classList.contains('open')).toBe(true)
+
+    rerender(<StepTimeline steps={liveSteps} streaming={false} />)
+    await Promise.resolve()
+    const after = Array.from(container.querySelectorAll('.trace-reasoning .collapse'))
+    expect(after.every((line) => !line.classList.contains('open'))).toBe(true)
   })
 
   it('思考行可单独展开，展开后显示全文', async () => {
@@ -77,7 +102,7 @@ describe('StepTimeline 结构', () => {
     line.click()
     await Promise.resolve()
     const body = container.querySelector('.trace-reasoning .thinking-body')
-    expect(body?.textContent).toBe('想A')
+    expect(body?.textContent).toContain('想A')
   })
 
   it('没有回合时不渲染', () => {

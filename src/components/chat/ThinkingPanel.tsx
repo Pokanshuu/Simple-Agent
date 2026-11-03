@@ -32,11 +32,12 @@ export function ThinkingPanel({
 }) {
   const t = useT()
   const autoCollapse = useSettingsStore((s) => s.settings.ui.autoCollapseThinking)
-  // 初值由「是否还在思考 + 设置」决定，之后完全听用户的
+  // 思考时展开；思考结束（正文开始）按设置收起。中途点击以用户为准，
+  // 直到下一次「开始思考 / 思考结束」状态切换。
   const [expanded, setExpanded] = useState(reasoningStreaming || !autoCollapse)
   useEffect(() => {
-    if (reasoningStreaming) setExpanded(true)
-  }, [reasoningStreaming])
+    setExpanded(reasoningStreaming || !autoCollapse)
+  }, [reasoningStreaming, autoCollapse])
   const seconds = thinkingMs ? Math.max(1, Math.round(thinkingMs / 1000)) : null
 
   const label = reasoningStreaming
