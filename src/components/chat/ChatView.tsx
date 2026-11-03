@@ -149,19 +149,31 @@ export function ChatView({
         )}
       </div>
 
-      {!stick && path.length > 0 && (
-        <button type="button" className="scroll-to-bottom" onClick={scrollToBottom} title={t('chat.scrollBottom')}>
-          <Icon name="arrow-down" size={14} />
-        </button>
-      )}
+      {/*
+       * 回到底部按钮钉在「输入区栈」的顶边，而不是面板底部一个写死的 px：
+       * 任务清单出现/消失、附件变多时都不用改数字，也不会压住正文中间。
+       */}
+      <div className="composer-stack">
+        {!stick && path.length > 0 && (
+          <button
+            type="button"
+            className="scroll-to-bottom"
+            onClick={scrollToBottom}
+            title={t('chat.scrollBottom')}
+            aria-label={t('chat.scrollBottom')}
+          >
+            <Icon name="arrow-down" size={14} />
+          </button>
+        )}
 
-      {todos.length > 0 && (
-        <div className="todo-dock">
-          <TodoPanel todos={todos} />
-        </div>
-      )}
+        {todos.length > 0 && (
+          <div className="todo-dock">
+            <TodoPanel todos={todos} />
+          </div>
+        )}
 
-      <Composer />
+        <Composer />
+      </div>
       <ApprovalDialog />
 
       <Menu anchor={menuAnchor} onClose={() => setMenuAnchor(null)}>

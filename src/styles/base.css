@@ -1639,11 +1639,17 @@ a:hover {
   flex: 1;
 }
 
+/* 输入区栈：composer + 任务清单 + 回到底部，作为一整块贴底 */
+.composer-stack {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* 钉在输入区栈的顶边右侧，不再用「面板底部 - N px」这种写死的数字 */
 .scroll-to-bottom {
   position: absolute;
-  bottom: 108px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: -34px;
+  right: 24px;
   width: 26px;
   height: 26px;
   border-radius: var(--r-full);
