@@ -16,6 +16,7 @@ import { useT } from '@/i18n'
 import { useChatStore } from '@/state/chat'
 import type { Attachment, Message, TodoItem } from '@/core/types'
 import { formatTokens } from '@/core/tokenEstimate'
+import { answerStepIndex } from '@/core/agent/loop'
 
 function AttachmentList({ attachments }: { attachments: Attachment[] }) {
   if (attachments.length === 0) return null
@@ -106,6 +107,12 @@ function MessageItemImpl({
     () => message.steps.some((step) => step.toolCalls.length > 0),
     [message.steps],
   )
+
+  /** Everything except the turn that produced the visible answer. */
+  const timelineSteps = useMemo(() => {
+    const index = answerStepIndex(message.steps)
+    return index < 0 ? message.steps : message.steps.filter((_s, i) => i !== index)
+  }, [message.steps])
   const reasoningStreaming = streaming && message.content.trim().length === 0
   const reasoningText = message.reasoning?.trim() ?? ''
 
@@ -136,7 +143,7 @@ function MessageItemImpl({
             {showTodos && todos.length > 0 && <TodoPanel todos={todos} />}
 
             {(hasToolCalls || message.steps.length > 1) && (
-              <StepTimeline steps={message.steps} streaming={streaming} />
+              <StepTimeline steps={timelineSteps} streaming={streaming} />
             )}
 
             {message.content.trim().length > 0 ? (

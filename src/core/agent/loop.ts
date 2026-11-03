@@ -210,13 +210,26 @@ function toToolCalls(accumulator: ToolCallAccumulator): ToolCall[] {
   }))
 }
 
-/** The visible answer of a finished run: the last turn that produced text. */
-export function finalAnswer(steps: AgentStep[]): string {
+/**
+ * Index of the turn whose text is the **visible answer**: the last turn that has
+ * text and **no tool calls**.
+ *
+ * A turn that called tools is part of the execution trace, not the answer — its
+ * text belongs inside the step card, in the order it was written (text first,
+ * then the calls). Treating it as the answer is what made a tool card render
+ * *above* the sentence that preceded it.
+ */
+export function answerStepIndex(steps: AgentStep[]): number {
   for (let i = steps.length - 1; i >= 0; i--) {
-    const content = steps[i].content.trim()
-    if (content.length > 0) return content
+    if (steps[i].toolCalls.length === 0 && steps[i].content.trim().length > 0) return i
   }
-  return ''
+  return -1
+}
+
+/** The visible answer of a finished run (empty when the run ended on a tool call). */
+export function finalAnswer(steps: AgentStep[]): string {
+  const index = answerStepIndex(steps)
+  return index < 0 ? '' : steps[index].content
 }
 
 /** Reasoning of the last turn that had any — what the thinking panel shows. */

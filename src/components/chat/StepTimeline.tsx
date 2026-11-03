@@ -26,9 +26,8 @@ export function StepTimeline({
   const t = useT()
   const [manual, setManual] = useState<boolean | null>(null)
 
-  // The last step is the answer when it has no tool calls to show.
-  const last = steps[steps.length - 1]
-  const timeline = last && last.toolCalls.length === 0 ? steps.slice(0, -1) : steps
+  // 上层已经把「答案那一步」剔除了，这里照单全收。
+  const timeline = steps
   if (timeline.length === 0) return null
 
   const toolCount = timeline.reduce((sum, step) => sum + step.toolCalls.length, 0)

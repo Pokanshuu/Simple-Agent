@@ -3,7 +3,13 @@ import { describe, expect, it } from 'vitest'
 import type { ChatRequestBody } from '../chatRequest'
 import type { StreamEvent } from '../sseParser'
 import type { AgentStep, ToolCall, ToolResult } from '../types'
-import { finalAnswer, finalReasoning, runAgentLoop, type AgentLoopDeps } from './loop'
+import {
+  answerStepIndex,
+  finalAnswer,
+  finalReasoning,
+  runAgentLoop,
+  type AgentLoopDeps,
+} from './loop'
 import type { ToolSpec } from './tools'
 
 /**
@@ -327,6 +333,46 @@ describe('runAgentLoop', () => {
       durationMs: 0,
     })
     expect(finalAnswer(result.steps)).toBe('读不了。')
+  })
+})
+
+describe('answerStepIndex', () => {
+  const call = (): AgentStep => ({
+    index: 0,
+    content: '我先跑一遍测试',
+    reasoning: '',
+    toolCalls: [
+      {
+        id: 'c1',
+        name: 'run_shell',
+        args: '{}',
+        status: 'done',
+        result: { content: 'ok', isError: false, durationMs: 1 },
+      },
+    ],
+  })
+  const answer = (index: number, content: string): AgentStep => ({
+    index,
+    content,
+    reasoning: '',
+    toolCalls: [],
+  })
+
+  it('带工具调用的回合不是答案，正文归时间线', () => {
+    expect(answerStepIndex([call()])).toBe(-1)
+    expect(finalAnswer([call()])).toBe('')
+  })
+
+  it('答案取最后一个「有文字且无工具调用」的回合', () => {
+    const steps = [call(), answer(1, '16 项测试全部通过。'), call(), answer(3, '继续写渲染层。')]
+    expect(answerStepIndex(steps)).toBe(3)
+    expect(finalAnswer(steps)).toBe('继续写渲染层。')
+  })
+
+  it('末尾是工具调用时，答案仍取之前的纯文本回合', () => {
+    const steps = [call(), answer(1, '全部通过'), call()]
+    expect(answerStepIndex(steps)).toBe(1)
+    expect(finalAnswer(steps)).toBe('全部通过')
   })
 })
 
