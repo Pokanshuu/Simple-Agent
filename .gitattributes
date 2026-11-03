@@ -1,0 +1,8 @@
+# 统一换行，避免 Windows 检出把整个 diff 变成红色
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.icns binary
+*.db binary

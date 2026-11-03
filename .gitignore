@@ -1,0 +1,20 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# local data
+*.db
+*.db-shm
+*.db-wal
+
+# local scratch
+.tmp/
+tsconfig.tsbuildinfo

@@ -1,0 +1,53 @@
+{
+  "name": "simple-agent",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Simple Agent — React + Tauri desktop AI client with an agent loop",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -b --noEmit false",
+    "tauri": "tauri",
+    "app:dev": "tauri dev",
+    "app:build": "tauri build"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.12.4",
+    "@tauri-apps/plugin-dialog": "2.8.4",
+    "@tauri-apps/plugin-opener": "2.7.2",
+    "highlight.js": "11.12.0",
+    "lucide-react": "^1.66.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1",
+    "zustand": "5.0.16"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "5.2.0",
+    "typescript": "5.9.3",
+    "vite": "7.3.7",
+    "vitest": "5.1.0"
+  },
+  "license": "MIT",
+  "author": "Simple Agent contributors",
+  "repository": {
+    "url": "https://github.com/Pokanshuu/Simple-Agent.git",
+    "type": "git"
+  },
+  "homepage": "https://github.com/Pokanshuu/Simple-Agent#readme",
+  "keywords": [
+    "tauri",
+    "react",
+    "llm",
+    "agent",
+    "markdown",
+    "desktop"
+  ]
+}
