@@ -934,8 +934,8 @@ function AboutTab() {
         </div>
 
         <div className="muted" style={{ fontSize: 13, lineHeight: 1.7, marginTop: 8 }}>
-          本项目基于 <LinkText onClick={() => openLink(UPSTREAM_URL)}>{UPSTREAM_NAME}</LinkText> ：
-          保留消息树、流式 Markdown 渲染与上下文压缩，添加了工具调用、工作区沙箱与审批。
+          本项目基于 <LinkText onClick={() => openLink(UPSTREAM_URL)}>{UPSTREAM_NAME}</LinkText> 开发：
+          保留消息树、流式 Markdown 渲染与上下文压缩，添加了工具调用、工作区沙箱与审批等agent功能。
         </div>
 
         <div className="field-row" style={{ marginTop: 4 }}>
