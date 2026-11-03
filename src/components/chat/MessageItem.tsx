@@ -16,10 +16,10 @@ import { useT } from '@/i18n'
 import { useChatStore } from '@/state/chat'
 import type { Attachment, Message, TodoItem } from '@/core/types'
 import { formatTokens } from '@/core/tokenEstimate'
-import { answerStepIndex } from '@/core/agent/loop'
+import { bodyReasoning, placeSteps } from '@/core/agent/trace'
 
 /** How long the outgoing answer stays mounted while it dissolves. */
-const EXIT_MS = 170
+const EXIT_MS = 340
 
 /**
  * Keep the previous text alive for one animation when it stops being the answer.
@@ -147,13 +147,25 @@ function MessageItemImpl({
 
   const answer = useExitFade(message.content)
 
-  /** Everything except the turn that produced the visible answer. */
-  const timelineSteps = useMemo(() => {
-    const index = answerStepIndex(message.steps)
-    return index < 0 ? message.steps : message.steps.filter((_s, i) => i !== index)
-  }, [message.steps])
-  const reasoningStreaming = streaming && message.content.trim().length === 0
-  const reasoningText = message.reasoning?.trim() ?? ''
+  /*
+   * Two turns stay out of the trace:
+   * - the one holding the visible answer (its text is the message body),
+   * - the one currently being written (it has no text yet, only reasoning).
+   * Their reasoning is rendered right above the body, so the order still reads
+   * thought → text → tools.
+   */
+  const { timelineSteps, reasoningText, reasoningIsLive } = useMemo(() => {
+    const placement = placeSteps(message.steps)
+    return {
+      timelineSteps: placement.timeline,
+      reasoningText: bodyReasoning(message.steps, message.reasoning),
+      reasoningIsLive:
+        placement.active !== null &&
+        streaming &&
+        placement.active.content.trim().length === 0,
+    }
+  }, [message.steps, message.reasoning, streaming])
+
 
   const onCopy = async () => {
     if (await copyText(message.content)) toast.show(t('msg.copied'))
@@ -174,7 +186,7 @@ function MessageItemImpl({
             {reasoningText.length > 0 && (
               <ThinkingPanel
                 text={reasoningText}
-                reasoningStreaming={reasoningStreaming}
+                reasoningStreaming={reasoningIsLive}
                 thinkingMs={message.thinkingMs}
               />
             )}

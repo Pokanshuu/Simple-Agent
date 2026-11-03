@@ -87,6 +87,7 @@ export const zh = {
 
   'thinking.done': '已深度思考 · {s} 秒',
   'thinking.now': '正在思考…',
+  'thinking.label': '思考',
   'thinking.expand': '展开',
   'thinking.collapse': '收起',
 
@@ -328,6 +329,7 @@ export const en: Record<TextKey, string> = {
 
   'thinking.done': 'Thought for {s}s',
   'thinking.now': 'Thinking…',
+  'thinking.label': 'Thinking',
   'thinking.expand': 'Expand',
   'thinking.collapse': 'Collapse',
 

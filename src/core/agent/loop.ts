@@ -24,6 +24,7 @@
 import { ToolCallAccumulator, type StreamEvent } from '../sseParser'
 import type { ChatRequestBody, OutMessage } from '../chatRequest'
 import type { AgentStep, ToolCall, ToolResult, Usage } from '../types'
+import { answerStepIndex } from './trace'
 import type { ToolSpec } from './tools'
 
 export type ApprovalDecision = 'allow' | 'deny' | 'always'
@@ -210,23 +211,10 @@ function toToolCalls(accumulator: ToolCallAccumulator): ToolCall[] {
   }))
 }
 
-/**
- * Index of the turn whose text is the **visible answer**: the last turn that has
- * text and **no tool calls**.
- *
- * A turn that called tools is part of the execution trace, not the answer — its
- * text belongs inside the step card, in the order it was written (text first,
- * then the calls). Treating it as the answer is what made a tool card render
- * *above* the sentence that preceded it.
- */
-export function answerStepIndex(steps: AgentStep[]): number {
-  for (let i = steps.length - 1; i >= 0; i--) {
-    if (steps[i].toolCalls.length === 0 && steps[i].content.trim().length > 0) return i
-  }
-  return -1
-}
+/** Re-exported so callers keep importing placement rules from the loop module. */
+export { answerStepIndex, lastNoToolStepIndex, placeSteps } from './trace'
 
-/** The visible answer of a finished run (empty when the run ended on a tool call). */
+/** The visible answer of a finished run (empty when it ended on a tool call). */
 export function finalAnswer(steps: AgentStep[]): string {
   const index = answerStepIndex(steps)
   return index < 0 ? '' : steps[index].content

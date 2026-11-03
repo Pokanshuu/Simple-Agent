@@ -12,7 +12,7 @@
  *   wins for the message it was used on.
  */
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Icon } from '@/components/ui/Icon'
 import { useT } from '@/i18n'
 import { useSettingsStore } from '@/state/settings'
@@ -32,9 +32,11 @@ export function ThinkingPanel({
 }) {
   const t = useT()
   const autoCollapse = useSettingsStore((s) => s.settings.ui.autoCollapseThinking)
-  const [manual, setManual] = useState<boolean | null>(null)
-
-  const expanded = manual ?? (reasoningStreaming || !autoCollapse)
+  // 初值由「是否还在思考 + 设置」决定，之后完全听用户的
+  const [expanded, setExpanded] = useState(reasoningStreaming || !autoCollapse)
+  useEffect(() => {
+    if (reasoningStreaming) setExpanded(true)
+  }, [reasoningStreaming])
   const seconds = thinkingMs ? Math.max(1, Math.round(thinkingMs / 1000)) : null
 
   const label = reasoningStreaming
@@ -53,12 +55,12 @@ export function ThinkingPanel({
     <div className="thinking">
       <div
         className="disclosure"
-        onClick={() => setManual(!expanded)}
+        onClick={() => setExpanded(!expanded)}
         role="button"
         tabIndex={0}
         aria-expanded={expanded}
         onKeyDown={(event) => {
-          if (event.key === 'Enter' || event.key === ' ') setManual(!expanded)
+          if (event.key === 'Enter' || event.key === ' ') setExpanded(!expanded)
         }}
       >
         {reasoningStreaming ? (
